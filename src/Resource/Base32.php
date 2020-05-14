@@ -7,7 +7,7 @@
  * @license   https://sfire.io/license BSD 3-CLAUSE LICENSE
  */
 
-namespace sFire\OTP\Resource;
+namespace sFire\Otp\Resource;
 
 use sFire\Otp\Exception\RuntimeException;
 
