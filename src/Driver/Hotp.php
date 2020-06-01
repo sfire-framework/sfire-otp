@@ -6,7 +6,9 @@
  * @copyright Copyright (c) 2014-2020 sFire Framework.
  * @license   http://sfire.io/license BSD 3-CLAUSE LICENSE
  */
- 
+
+declare(strict_types=1);
+
 namespace sFire\Otp\Driver;
 
 use sFire\Otp\OtpAbstract;
@@ -25,7 +27,7 @@ class Hotp extends OtpAbstract {
      * @return string
      */
     public function counter(int $count): string {
-        return $this -> generateOTP($count);
+        return $this -> generateOtp($count);
     }
 
 
@@ -43,10 +45,12 @@ class Hotp extends OtpAbstract {
     /**
      * Returns the uri for a specific secret for HOTP method.
      * @param string $name
-     * @param int $initial_count
+     * @param int $initialCount
      * @return string
      */
-    public function getProvisioningUrl(string $name, int $initial_count): string {
-        return 'otpauth://hotp/' . urlencode($name) . '?secret=' . $this -> secret . '&counter=' . $initial_count;
+    public function getProvisioningUrl(string $name, int $initialCount): string {
+
+        $this -> validateSecret();
+        return 'otpauth://hotp/' . urlencode($name) . '?secret=' . $this -> secret . '&counter=' . $initialCount;
     }
 }

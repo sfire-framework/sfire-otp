@@ -10,8 +10,12 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use sFire\OTP\Driver\Hotp;
+use sFire\Otp\Driver\Hotp;
 
+
+/**
+ * Class HotpTest
+ */
 final class HotpTest extends TestCase {
 
 

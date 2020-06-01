@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace sFire\Otp;
 
+use sFire\Otp\Exception\RuntimeException;
 use sFire\Otp\Resource\Base32;
 
 
@@ -55,6 +56,15 @@ abstract class OtpAbstract Implements OtpInterface {
 
 
     /**
+     * Returns the secret
+     * @return null|string
+     */
+    public function getSecret(): ?string {
+        return $this -> secret;
+    }
+
+
+    /**
      * Set the type of a algorithm which will be used to generate the OTP
      * @param string $algorithm
      * @return object
@@ -92,7 +102,7 @@ abstract class OtpAbstract Implements OtpInterface {
         $caseInsensitive = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
         $caseSensitive   = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
         $numbersArr     = [2, 3, 4, 5, 6, 7];
-        $key             = '';
+        $secret             = '';
 
         $numbers  && ($array = array_merge($array, $numbersArr));
         $letters  && ($array = array_merge($array, $caseInsensitive));
@@ -101,11 +111,12 @@ abstract class OtpAbstract Implements OtpInterface {
         if(count($array) > 0) {
 
             for($i = 0; $i < $length; $i++) {
-                $key .= $array[array_rand($array, 1)];
+                $secret .= $array[array_rand($array, 1)];
             }
         }
 
-        return $key;
+        $this -> secret = $secret;
+        return $secret;
     }
 
 
@@ -114,7 +125,9 @@ abstract class OtpAbstract Implements OtpInterface {
      * @param int $input The number used to seed the HMAC hash function.
      * @return string
      */
-    protected function generateOTP(int $input): string {
+    protected function generateOtp(int $input): string {
+
+        $this -> validateSecret();
 
         $hash = hash_hmac($this -> algorithm, $this -> intToByteString($input), $this -> byteSecret());
         $hmac = [];
@@ -128,6 +141,19 @@ abstract class OtpAbstract Implements OtpInterface {
         $otp    = $code % pow(10, $this -> digits);
 
         return str_pad((string) $otp, $this -> digits, '0', STR_PAD_LEFT);
+    }
+
+
+    /**
+     * Checks if the secret has been set and if not, raise an error
+     * @return void
+     * @throws RuntimeException
+     */
+    protected function validateSecret(): void {
+
+        if(null === $this -> secret) {
+            throw new RuntimeException('Secret has not been set. Set it first with the "setSecret()" method.');
+        }
     }
 
 

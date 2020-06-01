@@ -6,7 +6,9 @@
  * @copyright Copyright (c) 2014-2020 sFire Framework.
  * @license   http://sfire.io/license BSD 3-CLAUSE LICENSE
  */
- 
+
+declare(strict_types=1);
+
 namespace sFire\Otp\Driver;
 
 use sFire\Otp\OtpAbstract;
@@ -44,7 +46,7 @@ class Totp extends OtpAbstract {
      * @return string
      */
     public function timestamp(int $timestamp): string {
-        return $this -> generateOTP($this -> timecode($timestamp));
+        return $this -> generateOtp($this -> timecode($timestamp));
     }
 
 
@@ -53,23 +55,35 @@ class Totp extends OtpAbstract {
      * @return string
      */
     public function now(): string {
-        return $this -> generateOTP($this -> timecode(time()));
+        return $this -> generateOtp($this -> timecode(time()));
     }
 
 
     /**
      * Verify if a password is valid for a specific counter value
      * @param string $otp
-     * @param int $timestamp 
+     * $param int $discrepancy Discrepancy is the factor of interval allowed on either side of the given timestamp
+     * @param int $timestamp
      * @return bool
      */
-    public function verify(string $otp, int $timestamp = null) {
+    public function verify(string $otp, ?int $discrepancy = 0, int $timestamp = null): bool {
 
         if($timestamp === null) {
             $timestamp = time();
         }
 
-        return $otp === $this -> timestamp($timestamp);
+        if(null === $discrepancy || 0 === $discrepancy) {
+            return $otp === $this -> timestamp($timestamp);
+        }
+
+        for($i = -$discrepancy; $i <= $discrepancy; ++$i) {
+
+            if($otp === $this -> timestamp($timestamp + ($i * $this -> interval))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -78,7 +92,9 @@ class Totp extends OtpAbstract {
      * @param string $name The account name to be used
      * @return string
      */
-    public function getProvisioningUrl(string $name) {
+    public function getProvisioningUrl(string $name): string {
+
+        $this -> validateSecret();
         return 'otpauth://totp/' . urlencode($name) . '?secret=' . $this -> secret;
     }
 

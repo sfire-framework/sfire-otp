@@ -10,8 +10,12 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use sFire\OTP\Driver\Totp;
+use sFire\Otp\Driver\Totp;
 
+
+/**
+ * Class TotpTest
+ */
 final class TotpTest extends TestCase {
 
 
@@ -64,9 +68,12 @@ final class TotpTest extends TestCase {
      */
     public function testIfTokenCanBeVerified(): void {
 
-        $this -> assertTrue($this -> totp -> verify('240156', 1569941537));
+        $this -> assertTrue($this -> totp -> verify('240156', 0, 1569941537));
+        $this -> assertTrue($this -> totp -> verify('717340', 1, 1590135749));
+        $this -> assertTrue($this -> totp -> verify('717340', 0, 1590135779));
+        $this -> assertTrue($this -> totp -> verify('717340', 1, 1590135809));
         $this -> assertTrue($this -> totp -> verify($this -> totp -> timestamp(time())));
-        $this -> assertFalse($this -> totp -> verify('012345', 1569941537));
+        $this -> assertFalse($this -> totp -> verify('012345', 0, 1569941537));
     }
 
 
@@ -90,7 +97,7 @@ final class TotpTest extends TestCase {
         $this -> totp -> setAlgorithm('ripemd160');
         $this -> totp -> setDigits(8);
 
-        $this -> assertTrue($this -> totp -> verify('30116834', 1569941537));
+        $this -> assertTrue($this -> totp -> verify('30116834', 0, 1569941537));
     }
 
 
