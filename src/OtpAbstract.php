@@ -49,7 +49,7 @@ abstract class OtpAbstract Implements OtpInterface {
      * @return object
      */
     public function setSecret(string $secret): object {
-    	
+
         $this -> secret = $secret;
         return $this;
     }
@@ -70,7 +70,7 @@ abstract class OtpAbstract Implements OtpInterface {
      * @return object
      */
     public function setAlgorithm(string $algorithm): object {
-    	
+
         $this -> algorithm = $algorithm;
         return $this;
     }
